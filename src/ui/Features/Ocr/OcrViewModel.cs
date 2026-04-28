@@ -36,8 +36,8 @@ using Nikse.SubtitleEdit.Logic;
 using Nikse.SubtitleEdit.Logic.Config;
 using Nikse.SubtitleEdit.Logic.Dictionaries;
 using Nikse.SubtitleEdit.Logic.Media;
-using Nikse.SubtitleEdit.UiLogic.Ocr;
 using Nikse.SubtitleEdit.Logic.Ocr.GoogleLens;
+using Nikse.SubtitleEdit.UiLogic.Ocr;
 using SkiaSharp;
 using System;
 using System.Collections.Generic;
@@ -119,7 +119,7 @@ public partial class OcrViewModel : ObservableObject
     [ObservableProperty] private ObservableCollection<GuessUsedItem> _allGuesses;
     [ObservableProperty] private GuessUsedItem? _selectedAllGuess;
     [ObservableProperty] private bool _hasPreProcessingSettings;
-    [ObservableProperty] private bool _hasCaptureAlignment; 
+    [ObservableProperty] private bool _hasCaptureAlignment;
     [ObservableProperty] private double _imageMaxHeight = 100;
     [ObservableProperty] private double _imageMaxWidth = 200;
     [ObservableProperty] private FontFamily _textBoxFontFamily;
@@ -261,7 +261,7 @@ public partial class OcrViewModel : ObservableObject
             DoPromptForUnknownWords = ocr.DoPromptForUnknownWords;
             DoTryToGuessUnknownWords = ocr.DoTryToGuessUnknownWords;
             DoAutoBreak = ocr.DoAutoBreak;
-            HasCaptureAlignment = ocr.CaptureAssaPosition; 
+            HasCaptureAlignment = ocr.CaptureAssaPosition;
         });
     }
 
@@ -286,7 +286,7 @@ public partial class OcrViewModel : ObservableObject
         ocr.DoPromptForUnknownWords = DoPromptForUnknownWords;
         ocr.DoTryToGuessUnknownWords = DoTryToGuessUnknownWords;
         ocr.DoAutoBreak = DoAutoBreak;
-        ocr.CaptureAssaPosition = HasCaptureAlignment; 
+        ocr.CaptureAssaPosition = HasCaptureAlignment;
         ocr.TextBoxFontSize = TextBoxFontSize;
         ocr.TextBoxFontBold = TextBoxFontWeight == FontWeight.Bold;
         ocr.TextBoxFontName = TextBoxFontFamily.Name;
@@ -2549,7 +2549,7 @@ public partial class OcrViewModel : ObservableObject
             SelectedDictionary.Name != GetDictionaryNameNone() &&
             _ocrFixEngine.IsLoaded() && DoFixOcrErrors)
         {
-            var text = alignment + resultTemp.ResultText; 
+            var text = alignment + resultTemp.ResultText;
 
             Dispatcher.UIThread.Post(() =>
             {
@@ -3248,6 +3248,13 @@ public partial class OcrViewModel : ObservableObject
     {
         Title = string.Format(Se.Language.Ocr.OcrX, fileName);
         _ocrSubtitle = new OcrSubtitleWebVttImages(subtitle, fileName);
+        OcrSubtitleItems = new ObservableCollection<OcrSubtitleItem>(_ocrSubtitle.MakeOcrSubtitleItems());
+    }
+
+    public void InitializeSpDvdSup(string fileName)
+    {
+        Title = string.Format(Se.Language.Ocr.OcrX, fileName);
+        _ocrSubtitle = new OcrSubtitleSpDvdSupImages(fileName);
         OcrSubtitleItems = new ObservableCollection<OcrSubtitleItem>(_ocrSubtitle.MakeOcrSubtitleItems());
     }
 

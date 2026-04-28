@@ -1,4 +1,3 @@
-using Nikse.SubtitleEdit.UiLogic.Export;
 using Avalonia.Controls;
 using Avalonia.Data;
 using Avalonia.Input;
@@ -138,10 +137,10 @@ using Nikse.SubtitleEdit.Logic.Config.Language;
 using Nikse.SubtitleEdit.Logic.Download;
 using Nikse.SubtitleEdit.Logic.Initializers;
 using Nikse.SubtitleEdit.Logic.Media;
-using Nikse.SubtitleEdit.Logic.Platform.Windows;
 using Nikse.SubtitleEdit.Logic.UndoRedo;
 using Nikse.SubtitleEdit.Logic.ValueConverters;
 using Nikse.SubtitleEdit.Logic.VideoPlayers.LibMpvDynamic;
+using Nikse.SubtitleEdit.UiLogic.Export;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -10458,7 +10457,7 @@ public partial class MainViewModel :
                     return;
                 }
             }
-
+            
             if (ext == ".mcc")
             {
                 var lines = FileUtil.ReadAllTextShared(fileName, Encoding.ASCII).SplitToLines();
@@ -10527,6 +10526,12 @@ public partial class MainViewModel :
                         }
                     }
 
+                    return;
+                }
+
+                if (FileUtil.IsSpDvdSup(fileName))
+                {
+                    ImportAndOcrSpDvdSup(fileName);
                     return;
                 }
 
@@ -10897,6 +10902,27 @@ public partial class MainViewModel :
         Dispatcher.UIThread.Post(async () =>
         {
             var result = await ShowDialogAsync<OcrWindow, OcrViewModel>(vm => { vm.InitializeWebVtt(subtitle, fileName); });
+
+            if (result.OkPressed)
+            {
+                ResetSubtitle();
+                _subtitleFileName = Path.GetFileNameWithoutExtension(fileName);
+                _converted = true;
+                _subtitle.Paragraphs.Clear();
+                Subtitles.Clear();
+                Subtitles.AddRange(result.OcredSubtitle);
+                Renumber();
+                ShowStatus(string.Format(Se.Language.General.SubtitleLoadedX, fileName));
+                SelectAndScrollToRow(0);
+            }
+        });
+    }
+
+    private void ImportAndOcrSpDvdSup(string fileName)
+    {
+        Dispatcher.UIThread.Post(async () =>
+        {
+            var result = await ShowDialogAsync<OcrWindow, OcrViewModel>(vm => { vm.InitializeSpDvdSup(fileName); });
 
             if (result.OkPressed)
             {
